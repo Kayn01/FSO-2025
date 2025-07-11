@@ -66,26 +66,39 @@ const mostLikes = (blogs) => {
         return null
     }
 
-    const authorLikes = {}
+    const groupedByAuthor = _.groupBy(blogs, 'author')
 
-    blogs.forEach(blog => {
-        authorLikes[blog.author] = (authorLikes[blog.author] || 0) + blog.likes
-    })
+    const authorLikesSum = _.mapValues(groupedByAuthor, (authorBlogs) => 
+        _.sumBy(authorBlogs, 'likes')
+    )
 
-    let topAuthor = ''
-    let maxLikes = -1
-
-    for(const author in authorLikes){
-        if(authorLikes[author] > maxLikes){
-            maxLikes = authorLikes[author]
-            topAuthor = author
-        }
-    }
+    const topAuthor = _.maxBy(Object.keys(authorLikesSum), (author) => authorLikesSum[author])
 
     return {
         author: topAuthor,
-        likes: maxLikes
+        likes: authorLikesSum[topAuthor]
     }
+
+    // const authorLikes = {}
+
+    // blogs.forEach(blog => {
+    //     authorLikes[blog.author] = (authorLikes[blog.author] || 0) + blog.likes
+    // })
+
+    // let topAuthor = ''
+    // let maxLikes = -1
+
+    // for(const author in authorLikes){
+    //     if(authorLikes[author] > maxLikes){
+    //         maxLikes = authorLikes[author]
+    //         topAuthor = author
+    //     }
+    // }
+
+    // return {
+    //     author: topAuthor,
+    //     likes: maxLikes
+    // }
 }
 
 module.exports = {
