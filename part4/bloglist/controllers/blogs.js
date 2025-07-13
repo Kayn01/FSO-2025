@@ -9,16 +9,22 @@ blogsRouter.get('/', async (request, response) => {
     // })
 })
 
-blogsRouter.post('/', (request, response) => {
-    const blog = new Blog(request.body)
+blogsRouter.post('/', async (request, response) => {
+    const body = request.body
+    const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes === undefined ? 0 : body.likes
+    })
 
-    blog.save().then(result => {
-        response.status(202).json(result)
-    })
-    .catch(error => {
+    try{
+        const savedBlog = await blog.save()
+        response.status(201).json(savedBlog)
+    }catch(error){
         console.error('Error saving blog:', error.message)
-        response.status(400).json({ error: 'Failed to save blog' })
-    })
+        response.status(400).json({ error: 'Failed to save blog'})
+    }
 })
 
 module.exports = blogsRouter
