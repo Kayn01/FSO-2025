@@ -118,6 +118,48 @@ describe('Blog API', () => {
     })
 })
 
+describe('deletion of a blog', () => {
+    test('succeeds with status 204 if id is valid', async () => {
+        const blogsStart = await Blog.find({})
+        const blogToDelete = blogsStart[0]
+
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+        
+        const blogsEnd = await Blog.find({})
+
+        expect(blogsEnd).toHaveLength(initialBlogs.length - 1)
+        const titles = blogsEnd.map(blog => blog.title)
+        expect(titles).not.toContain(blogToDelete.title)
+    })
+
+  
+})
+
+describe('updating a blog', () => {
+    test('succeeds with status code 200 and update likes', async () => {
+        const blogsStart = await Blog.find({})
+        const blogToUpdate = blogsStart[0]
+        const updatedLikes = blogToUpdate.likes + 5
+
+        const updatedBlogData = { ...blogToUpdate.toJSON(), likes: updatedLikes}
+
+        const response = await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatedBlogData)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        expect(response.body.likes).toBe(updatedLikes)
+
+        const blogAfterUpdate = await Blog.findById(blogToUpdate.id)
+        expect(blogAfterUpdate.likes).toBe(updatedLikes)
+    })
+
+ 
+})
+
 afterAll(async () => {
     await mongoose.connection.close()
 })
