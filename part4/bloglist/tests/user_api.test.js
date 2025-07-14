@@ -60,4 +60,42 @@ describe('when there is initially one user in db', () => {
         assert(result.body.error && (result.body.error.includes('unique') || result.body.error.includes('duplicate key')))
         assert.strictEqual(usersAtEnd.length, usersAtStart.length)
     })
+
+    test('creation fails with status 400 and message if username is missing', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            name: 'Missing Username',
+            password: 'validpassword',
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+        
+        assert(result.body.error.includes('username must be at least 3 characters long'))
+        const usersAtEnd = await helper.usersInDb()
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('creation fails with status 400 and message if password is missing', async () =>{
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            username: 'user',
+            name: 'missingPass',
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+        
+        assert(result.body.error.includes('password must be at least 3 characters long'))
+        const usersAtEnd = await helper.usersInDb()
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
 })
