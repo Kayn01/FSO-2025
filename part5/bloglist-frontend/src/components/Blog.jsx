@@ -22,9 +22,9 @@ const Blog = ({ blog, handleLike, handleDelete, user }) => {
   }
 
   const showDeleteButton = user && blog.user && (blog.user.id === user.id)
-  console.log(user)
+  console.log(blog, user)
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog-item'>
       <div>
         {blog.title} {blog.author} &nbsp;
         <button onClick={() => setShowDetails(!showDetails)}>
