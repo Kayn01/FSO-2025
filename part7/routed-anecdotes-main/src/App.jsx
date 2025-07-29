@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route, Link, useParams, useNavigate } from 'react-router-dom'
-import anecdotes from '../../../part6/redux-anecdotes-main/src/services/anecdotes'
+import { useField } from './hooks'
 
 const Menu = () => {
   const padding = {
@@ -67,22 +67,22 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
 
   const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
 
-    props.setNotification(`A new anecdote "${content}" created!`)
+    props.setNotification(`A new anecdote "${content.value}" created!`)
 
     setTimeout(() => {
       props.setNotification('')
@@ -91,23 +91,34 @@ const CreateNew = (props) => {
     navigate('/')
   }
 
+  const handleReset = () => {
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+
+  const { reset: contentReset, ...contentInputProps } = content
+  const { reset: authorReset, ...authorInputProps } = author
+  const { reset: infoReset, ...infoInputProps } = info
+
   return (
     <div>
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input name='content' {...contentInputProps} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input name='author' {...authorInputProps} />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input name='info' {...infoInputProps} />
         </div>
-        <button>create</button>
+        <button type='submit'>create</button>
+        <button type='button' onClick={handleReset}>reset</button>
       </form>
     </div>
   )
