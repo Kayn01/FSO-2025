@@ -34,5 +34,50 @@
       "number": "",
       "id": 4
     }
+  ],
+  "blogs": [
+    {
+      "id": "1",
+      "title": "First Blog Post",
+      "author": "John Doe",
+      "url": "http://example.com/first",
+      "likes": 5,
+      "user": {
+        "id": "user1",
+        "username": "mluukkai",
+        "name": "Matti Luukkainen"
+      }
+    },
+    {
+      "id": "2",
+      "title": "Learning Redux is Fun",
+      "author": "Jane Smith",
+      "url": "http://example.com/redux",
+      "likes": 10,
+      "user": {
+        "id": "user2",
+        "username": "testuser",
+        "name": "Test User"
+      }
+    }
+  ],
+  "users": [
+    {
+      "id": "user1",
+      "username": "mluukkai",
+      "name": "Matti Luukkainen",
+      "password": "salainen"
+    },
+    {
+      "id": "user2",
+      "username": "testuser",
+      "name": "Test User",
+      "password": "password"
+    },
+    {
+      "username": "testuser",
+      "password": "password",
+      "id": "mGHFvNT"
+    }
   ]
 }
