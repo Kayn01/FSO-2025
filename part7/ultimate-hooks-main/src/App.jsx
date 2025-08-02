@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux'
 import { setNotification, clearNotification } from './reducers/notificationReducer'
 import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogReducer'
 import { loginUser, logoutUser, initializeUser } from './reducers/userReducer'
+import { Routes, Route, Link, } from 'react-router-dom'
+import Users from './components/Users'
+import { initializeUsers } from './reducers/usersReducer'
 
 const useField = (type) => {
   const [value, setValue] = useState('')
@@ -52,6 +55,7 @@ const useResource = (baseUrl) => {
   ]
 }
 
+
 const Notification = () => {
   const notification = useSelector(state => state.notification)
 
@@ -96,6 +100,7 @@ const App = () => {
   useEffect(() => {
     dispatch(initializeBlogs())
     dispatch(initializeUser())
+    dispatch(initializeUsers())
   }, [dispatch])
 
   const handleLogin = async (event) => {
@@ -212,6 +217,8 @@ const App = () => {
       <p>{user.name} logged in
         <button onClick={handleLogout}>logout</button>
       </p>
+
+      <Users />
 
       <h2>notes</h2>
       <form onSubmit={handleNoteSubmit}>

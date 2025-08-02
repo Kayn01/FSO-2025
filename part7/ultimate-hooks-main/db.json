@@ -73,11 +73,6 @@
       "username": "testuser",
       "name": "Test User",
       "password": "password"
-    },
-    {
-      "username": "testuser",
-      "password": "password",
-      "id": "mGHFvNT"
     }
   ]
 }
