@@ -46,7 +46,17 @@
         "id": "user1",
         "username": "mluukkai",
         "name": "Matti Luukkainen"
-      }
+      },
+      "comments": [
+        {
+          "id": "comment1",
+          "content": "Great post!"
+        },
+        {
+          "id": "comment2",
+          "content": "Very insightful."
+        }
+      ]
     },
     {
       "id": "2",
@@ -58,7 +68,21 @@
         "id": "user2",
         "username": "testuser",
         "name": "Test User"
-      }
+      },
+      "comments": [
+        {
+          "id": "yapp",
+          "content": "Great post!"
+        },
+        {
+          "id": "eeor",
+          "content": "Very insightful."
+        },
+        {
+          "id": "1754135693086",
+          "content": "agsd"
+        }
+      ]
     }
   ],
   "users": [

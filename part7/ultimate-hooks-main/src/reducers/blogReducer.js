@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs'
+import { setNotification } from './notificationReducer'
 
 const blogSlice = createSlice({
     name: 'blogs',
@@ -21,11 +22,17 @@ const blogSlice = createSlice({
         removeBlog(state,action){
             const idToRemove = action.payload
             return state.filter(blog => blog.id !== idToRemove)
+        },
+        addCommentToBlog(state, action){
+            const updatedBlog = action.payload
+            return state.map(blog =>
+                blog.id === updatedBlog.id ? updatedBlog : blog
+            ).sort((a, b) => b.likes - a.likes)
         }
     },
 })
 
-export const { setBlogs, appendBlog, updateBlog, removeBlog} = blogSlice.actions
+export const { setBlogs, appendBlog, updateBlog, removeBlog, addCommentToBlog} = blogSlice.actions
 
 export const initializeBlogs = () => {
     return async dispatch => {
@@ -53,6 +60,19 @@ export const deleteBlog = (id) => {
     return async dispatch => {
         await blogService.remove(id)
         dispatch(removeBlog(id))
+    }
+}
+
+export const commentBlog = (blogId, commentContent) => {
+    return async dispatch => {
+        try {
+            const updatedBlog = await blogService.addComment(blogId, commentContent)
+            dispatch(addCommentToBlog(updatedBlog))
+            dispatch(setNotification('Comment added!', 3))
+        }catch(error){
+            dispatch(setNotification(`Error adding comment: ${error.message}`, 5))
+            console.error('Error adding comment:', error)
+        }
     }
 }
 

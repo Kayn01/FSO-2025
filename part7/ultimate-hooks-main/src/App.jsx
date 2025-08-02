@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux'
-import { setNotification, clearNotification } from './reducers/notificationReducer'
+import { setNotification } from './reducers/notificationReducer' 
 import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogReducer'
 import { loginUser, logoutUser, initializeUser } from './reducers/userReducer'
-import { Routes, Route, Link, } from 'react-router-dom'
+import { Routes, Route, Link, useParams } from 'react-router-dom' 
 import Users from './components/Users'
+import User from './components/User' 
+import Blog from './components/Blog'
 import { initializeUsers } from './reducers/usersReducer'
 
 const useField = (type) => {
@@ -22,6 +24,7 @@ const useField = (type) => {
   }
 }
 
+// Keep useResource for notes and persons, it's fine
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
@@ -77,6 +80,66 @@ const Notification = () => {
   )
 }
 
+const Home = ({
+  user, blogs,
+  handleLogout, handleBlogSubmit, handleLike, handleDelete,
+  title, author, url,
+  notes, handleNoteSubmit, content,
+  persons, handlePersonSubmit, name, number
+}) => {
+  return (
+    <div>
+      <h2>Blog App</h2>
+
+      <h3>Create New Blog</h3>
+      <form onSubmit={handleBlogSubmit}>
+        <div>
+          title:
+          <input {...title} />
+        </div>
+        <div>
+          author:
+          <input {...author} />
+        </div>
+        <div>
+          url:
+          <input {...url} />
+        </div>
+        <button type="submit">create</button>
+      </form>
+
+      <h3>Blogs</h3>
+      {blogs.map(blog => (
+        <p key={blog.id}>
+          <Link to={`/blogs/${blog.id}`}>
+            {blog.title}
+          </Link>{' '}
+           {blog.author} (Likes: {blog.likes})
+          <button onClick={() => handleLike(blog)}>like</button>
+          <button onClick={() => handleDelete(blog)}>delete</button>
+        </p>
+      ))}
+
+      <h2>Notes</h2>
+      <form onSubmit={handleNoteSubmit}>
+        <input {...content} />
+        <button>create</button>
+      </form>
+      {notes.map(n => <p key={n.id}>{n.content}</p>)}
+
+      <h2>Persons</h2>
+      <form onSubmit={handlePersonSubmit}>
+        name <input {...name} /> <br/>
+        number <input {...number} />
+        <button>create</button>
+      </form>
+      {persons.map(n => <p key={n.id}>{n.name} {n.number}</p>)}
+    </div>
+  )
+}
+
+
+
 const App = () => {
   const content = useField('text')
   const name = useField('text')
@@ -90,7 +153,7 @@ const App = () => {
   const password = useField('password')
 
   const blogs = useSelector(state => state.blogs)
-  const user = useSelector(state => state.user)
+  const user = useSelector(state => state.user) 
 
   const [notes, noteService] = useResource('http://localhost:3005/notes')
   const [persons, personService] = useResource('http://localhost:3005/persons')
@@ -100,7 +163,7 @@ const App = () => {
   useEffect(() => {
     dispatch(initializeBlogs())
     dispatch(initializeUser())
-    dispatch(initializeUsers())
+    dispatch(initializeUsers()) 
   }, [dispatch])
 
   const handleLogin = async (event) => {
@@ -131,7 +194,8 @@ const App = () => {
         title: title.value,
         author: author.value,
         url: url.value,
-        likes: 0
+        likes: 0,
+        user: user ? { id: user.id, username: user.username, name: user.name } : null // Ensure user info is attached
       }
       dispatch(createBlog(newBlogObject))
       dispatch(setNotification(`a new blog '${newBlogObject.title}' by ${newBlogObject.author} added`, 5))
@@ -170,7 +234,7 @@ const App = () => {
   const handleNoteSubmit = async (event) => {
     event.preventDefault()
     try {
-      await noteService.create({ content: value })
+      await noteService.create({ content: content.value }) // Use content.value
       dispatch(setNotification(`a new note '${content.value}' created`, 5))
       content.onChange({ target: {value: ''}})
     }catch(error){
@@ -188,6 +252,10 @@ const App = () => {
     }catch(error){
       dispatch(setNotification('Error adding person', 5))
     }
+  }
+
+  const padding = {
+    padding: 5
   }
 
   if(user === null){
@@ -214,52 +282,30 @@ const App = () => {
     <div>
       <Notification/>
 
-      <p>{user.name} logged in
+      {/* Navigation Bar */}
+      <div>
+        <Link style={padding} to="/">blogs</Link>
+        <Link style={padding} to="/users">users</Link>
+        {user.name} logged in
         <button onClick={handleLogout}>logout</button>
-      </p>
+      </div>
 
-      <Users />
-
-      <h2>notes</h2>
-      <form onSubmit={handleNoteSubmit}>
-        <input {...content} />
-        <button>create</button>
-      </form>
-      {notes.map(n => <p key={n.id}>{n.content}</p>)}
-
-      <h2>persons</h2>
-      <form onSubmit={handlePersonSubmit}>
-        name <input {...name} /> <br/>
-        number <input {...number} />
-        <button>create</button>
-      </form>
-      {persons.map(n => <p key={n.id}>{n.name} {n.number}</p>)}
-
-      <h3>Create New Blog</h3>
-      <form onSubmit={handleBlogSubmit}>
-        <div>
-          title:
-          <input {...title} />
-        </div>
-        <div>
-          author:
-          <input {...author} />
-        </div>
-        <div>
-          url:
-          <input {...url} />
-        </div>
-        <button type="submit">create</button>
-      </form>
-
-      <h3>Blogs</h3>
-      {blogs.map(blog => (
-        <p key={blog.id}>
-          {blog.title} {blog.author} (Likes: {blog.likes})
-          <button onClick={() => handleLike(blog)}>like</button>
-          <button onClick={() => handleDelete(blog)}>delete</button>
-        </p>
-      ))}
+      {/* Define Routes */}
+      <Routes>
+        <Route path="/" element={
+          <Home
+            user={user} blogs={blogs}
+            handleLogout={handleLogout} handleBlogSubmit={handleBlogSubmit}
+            handleLike={handleLike} handleDelete={handleDelete}
+            title={title} author={author} url={url}
+            notes={notes} handleNoteSubmit={handleNoteSubmit} content={content}
+            persons={persons} handlePersonSubmit={handlePersonSubmit} name={name} number={number}
+          />
+        } />
+        <Route path="/users" element={<Users />} />
+        <Route path="/users/:id" element={<User />} />
+        <Route path="/blogs/:id" element={<Blog />} />
+      </Routes>
     </div>
   )
 }
